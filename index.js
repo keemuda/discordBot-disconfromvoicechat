@@ -1,6 +1,9 @@
-import { Client, GatewayIntentBits } from 'discord.js';
+const { Client, GatewayIntentBits } = require('discord.js')
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates] });
 const moment = require('moment-timezone');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
@@ -50,9 +53,9 @@ client.on('interactionCreate', async interaction => {
       const voiceChannel = interaction.member.voice.channel;
       if (voiceChannel) {
         await interaction.member.voice.disconnect();
-        interaction.followUp(`Disconnected ${interaction.member.displayName} from the voice channel.`);
+        interaction.reply(`Disconnected ${interaction.member.displayName} from the voice channel.`);
       } else {
-        interaction.followUp(`${interaction.member.displayName}, you are no longer in the voice channel.`);
+        interaction.reply(`${interaction.member.displayName}, you are no longer in the voice channel.`);
       }
     }, waitTime);
 
@@ -60,4 +63,4 @@ client.on('interactionCreate', async interaction => {
 
 });
 
-client.login(TOKEN);
+client.login(process.env.DISCORD_TOKEN);
