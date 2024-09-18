@@ -49,13 +49,15 @@ client.on('interactionCreate', async interaction => {
     const waitTime = scheduledTime.diff(now)
     await interaction.reply(`Scheduled to disconnect ${interaction.member.displayName} at:${timeString}`);
 
+    await interaction.deferReply();
+
     setTimeout(async () => {
       const voiceChannel = interaction.member.voice.channel;
       if (voiceChannel) {
         await interaction.member.voice.disconnect();
-        interaction.reply(`Disconnected ${interaction.member.displayName} from the voice channel.`);
+        await interaction.followUp(`Disconnected ${interaction.member.displayName} from the voice channel.`);
       } else {
-        interaction.reply(`${interaction.member.displayName}, you are no longer in the voice channel.`);
+        await interaction.followUp(`${interaction.member.displayName}, you are no longer in the voice channel.`);
       }
     }, waitTime);
 
