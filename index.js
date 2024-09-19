@@ -5,6 +5,10 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
+const voicekickCommand = require('./command/voicekick')
+const scheduledDisconnects = new Map();
+
+
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
@@ -27,38 +31,7 @@ client.on('interactionCreate', async interaction => {
   }
 
   if (interaction.commandName === 'voicekick') {
-    const timeString = interaction.options.getString('time');
-    const timezone = 'Asia/Bangkok';
-
-    let scheduledTime;
-    try {
-      scheduledTime = moment.tz(timeString, ['h A', 'h:mm A', 'HH:mm'], timezone);
-      if (!scheduledTime.isValid()) {
-        await interaction.reply('Please enter a valid time format. Supported formats are: "4 AM", "4:30 PM", "16:00".');
-        return;
-      }
-    } catch (err) {
-      await interaction.reply('Please enter a valid time format. Supported formats are: "4 AM", "4:30 PM", "16:00".');
-      return;
-    }
-
-    const now = moment.tz(timezone);
-    if (scheduledTime.isBefore(now)) {
-      scheduledTime.add(1, 'day');
-    }
-    const waitTime = scheduledTime.diff(now)
-    await interaction.reply(`Scheduled to disconnect ${interaction.member.displayName} at:${timeString}`);
-
-    setTimeout(async () => {
-      const voiceChannel = interaction.member.voice.channel;
-      if (voiceChannel) {
-        await interaction.member.voice.disconnect();
-        await interaction.channel.send(`Disconnected ${interaction.member.displayName} from the voice channel.`);
-      } else {
-        await interaction.channel.send(`${interaction.member.displayName}, you are no longer in the voice channel.`);
-      }
-    }, waitTime);
-
+   await voicekickCommand.execute(interaction,scheduledDisconnects);
   }
 
 });
